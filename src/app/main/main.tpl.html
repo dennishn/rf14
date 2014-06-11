@@ -1,0 +1,18 @@
+<h1>Hvor er CuTh</h1>
+<div
+    map
+    class="map"
+    center="{{mapCenter}}"
+    disable-default-u-i="true"
+    zoom="16"
+    on-click="addMarker()">
+    <!-- <marker
+        ng-repeat="marker in markers"
+        position="[marker.coords.A, marker.coords.K]">
+    </marker> -->
+</div>
+<button ng-click="toggleMap()">Toggle Kort</button>
+<button ng-click="authenticate()">Log Ind</button>
+
+<p>Sidste check-in {{lastCheckin | amCalendar}}</p>
+
