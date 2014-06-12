@@ -24,7 +24,7 @@ USGSOverlay.prototype.onAdd = function() {
     div.style.border = "none";
     div.style.borderWidth = "0px";
     div.style.position = "absolute";
-    div.className = 'festival_map';
+    div.className = 'map__overlay';
     var obj = document.createElement("object");
     obj.type ="image/svg+xml";
     obj.data = this.image_;
@@ -92,9 +92,19 @@ app.controller('MainCtrl', function ($scope, $http, $q, $firebase, $firebaseSimp
         });
     });
 
+    $scope.showError = false;
+    $scope.showBackdrop = false;
     $scope.toggleMap = function() {
-        angular.element('.festival_map').toggleClass('hidden');
+        // angular.element('.festival_map').toggleClass('hidden');
+        $scope.testMessage = 'such modal';
+        $scope.showError = !$scope.showError;
+        $scope.showBackdrop = !$scope.showBackdrop;
     };
+
+    $scope.hideError = function() {
+        $scope.showError = false;
+        $scope.showBackdrop = false;
+    }
 
     // Dummy event for when user is not logged in
     $scope.addMarker = function(event) {
@@ -193,8 +203,6 @@ app.controller('MainCtrl', function ($scope, $http, $q, $firebase, $firebaseSimp
     }
 
 });
-
-
 /*-----  End of Controller = Main  ------*/
 
 

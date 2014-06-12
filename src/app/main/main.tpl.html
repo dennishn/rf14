@@ -1,4 +1,3 @@
-<h1>Hvor er CuTh</h1>
 <div
     map
     class="map"
@@ -16,3 +15,7 @@
 
 <p>Sidste check-in {{lastCheckin | amCalendar}}</p>
 
+<div ng-if="showError" class="dialog dialog--error dialog__animation--jelly">
+    <div class="" ng-include="'app/main/main.dialog.error.tpl.html'"></div>
+</div>
+<div ng-if="showBackdrop" class="backdrop backdrop__animation--fade"></div>

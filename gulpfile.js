@@ -140,7 +140,10 @@ gulp.task('wiredep', function() {
         .pipe(wiredep({
             exclude: [
                 'modernizr.js',
-                'foundation.css'
+                'foundation.css',
+                'foundation.js',
+                'jquery.placeholder.js',
+                'jquery.cookie.js'
                 ]
         }))
         .pipe(gulp.dest(settings.devPaths.app));

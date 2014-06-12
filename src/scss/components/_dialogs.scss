@@ -1,0 +1,65 @@
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -150px;
+    margin-left: -150px;
+    width: 300px;
+    max-width: 100%;
+    height: 300px;
+    background: #fff;
+    z-index: 1000;
+    @media #{$medium-up} {
+        width: 400px;
+        height: 400px;
+        margin-top: -200px;
+        margin-left: -200px;
+    }
+}
+.backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 500;
+}
+
+// Animations
+.dialog__animation--jelly {
+    transition: opacity .2s ease-in-out;
+    &.ng-enter {
+        opacity: 0;
+        animation: jelly-in 800ms linear both;
+    }
+    &.ng-enter-active {
+        opacity: 1;
+        // transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    }
+    &.ng-leave {
+        opacity: 1;
+        // animation: jelly-out 500ms linear both;
+        // animation: jelly-in 1000ms linear both;
+    }
+    &.ng-leave-active {
+        opacity: 0;
+    }
+}
+
+.backdrop__animation--fade {
+    transition: opacity .2s ease-in-out;
+    &.ng-enter {
+        opacity: 0;
+    }
+    &.ng-enter-active {
+        opacity: 1;
+    }
+    &.ng-leave {
+        opacity: 1;
+        transition-delay: .1s;
+    }
+    &.ng-leave-active {
+        opacity: 0;
+    }
+}
