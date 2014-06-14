@@ -34,11 +34,30 @@ app.config(['$routeProvider', '$locationProvider', '$httpProvider', function ($r
 =>                  rf14 App Run()
 ==================================================================*/
 
-app.run(['$rootScope', 'amMoment', function ($rootScope, amMoment) {
+app.run(['$rootScope', '$window', 'amMoment', function ($rootScope, $window, amMoment) {
 
 	'use strict';
 
     amMoment.changeLanguage('da');
+
+
+    if($window.Modernizr.touch) {
+        $rootScope.isTouch = true;
+    } else {
+        $rootScope.isTouch = false;
+    }
+
+    $rootScope.appLoading = true;
+    $rootScope.asyncLoading = false;
+    $rootScope.userLoggedIn = false;
+
+    $rootScope.$on("$firebaseSimpleLogin:login", function(e, user) {
+        $rootScope.userLoggedIn = true;
+    });
+
+    $rootScope.$on("$firebaseSimpleLogin:logout", function(e, user) {
+        $rootScope.userLoggedIn = false;
+    });
 
 }]);
 

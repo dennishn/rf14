@@ -5,7 +5,10 @@
 <head>
     <meta charset="utf-8">
     <title>rf14</title>
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
     <!-- build:css css/main.css -->
     <!-- bower:css -->
@@ -45,10 +48,14 @@
     <!-- endbower -->
     <script src="bower_components/moment/lang/da.js"></script>
     <script src="common/utils/maps.utility.infobox.js"></script>
-    <script src="common/utils/maps.utility.markerwithlabel.js"></script>
+    <script src="common/utils/maps.utility.richmarker.js"></script>
+    <script src="common/utils/random.color.js"></script>
     <script src="app/app.js"></script>
     <script src="app/main/main.js"></script>
     <script src="common\factories\firebase.js"></script>
+    <script src="common\directives\appLayout.js"></script>
+    <script src="common\factories\Auth.js"></script>
+    <script src="common\filters\firstName.js"></script>
     <!-- endbuild -->
 </body>
 </html>
