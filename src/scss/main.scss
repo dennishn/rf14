@@ -16,9 +16,6 @@
     "mixins",
     "variables";
 
-
-
-
 // Foundation Functions / Helpers
 @import "../bower_components/foundation/scss/foundation/functions";
 
@@ -69,12 +66,15 @@
 
 // App Components (Uncomment the import statement below to get started)
 @import
+    "animations",
 // Utilities
 // Elements
 // Modules
 // Components
-    "components/map";
+    "components/dialogs",
+    "components/map",
 // UI-Blocks
 // Layouts
+    "layouts/master";
 // Pages
 // Plugins
