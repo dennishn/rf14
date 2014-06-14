@@ -57527,7 +57527,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
 
     $scope.addMarker = function(event) {
 
-        if($scope.user) {
+        if($rootScope.userLoggedIn) {
             var time = new Date();
 
             if($scope.lastMarker) {
@@ -57617,9 +57617,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
     $scope.logout = function() {
         Auth.logout();
         // $scope.user = null;
-        $scope.addMarker = function() {
-            $scope.hint = 'Du skal være logget ind for at placere en marker';
-        }
+
     }
 });
 /*-----  End of Controller = Main  ------*/
