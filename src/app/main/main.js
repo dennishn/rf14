@@ -7,6 +7,8 @@
 // CUSTOM OVERLAYS
 // ------------------------------------------------------------
 
+
+
 function USGSOverlay(bounds, image, map) {
   this.bounds_ = bounds;
   this.image_ = image;
@@ -48,21 +50,33 @@ USGSOverlay.prototype.draw = function() {
 };
 
 
-app.controller('MainCtrl', function ($scope, $http, $q, $firebase, $firebaseSimpleLogin, FIREBASE_URL, firebaseFactory) {
+app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $firebaseSimpleLogin, FIREBASE_URL, firebaseFactory, Auth) {
 
     'use strict';
 
+    // var dataRef = new Firebase("https://cuth.firebaseio.com");
+    // $scope.auth = $firebaseSimpleLogin(dataRef);
+
     $scope.map = '';
     $scope.marker = '';
+    $scope.markers = {};
+
+    $scope.errorShown = false;
+    $scope.backdropShown = false;
+
     $scope.mapCenter = [55.61699, 12.08233];
 
     var se  =   new google.maps.LatLng(55.6076, 12.0528);
     var nw  =   new google.maps.LatLng(55.6309, 12.1097);
     var imageBounds = new google.maps.LatLngBounds(se, nw);
+    var markersArray = [];
+
 
     $scope.markerImage = {
         url: 'img/marker.svg'
     };
+
+    // $rootScope.appLoading = true;
 
     $scope.$on('mapInitialized', function(event, args) {
         $scope.map = args[0];
@@ -72,136 +86,200 @@ app.controller('MainCtrl', function ($scope, $http, $q, $firebase, $firebaseSimp
         $scope.markersRef.$on("loaded", function(markers) {
 
             $scope.markers = markers;
+
             angular.forEach(markers, function(value, key) {
                 var owner = value.owner;
+                var color = value.color;
                 var markerPos = new google.maps.LatLng(value.coords.k, value.coords.A);
                 $scope.lastCheckin = value.time;
 
-                $scope.marker = new MarkerWithLabel({
+                var marker = new RichMarker({
                     position: markerPos,
                     map: $scope.map,
                     draggable: false,
-                    labelContent: owner,
-                    labelClass: 'marker__label',
-                    labelInBackground: false,
-                    labelAnchor: new google.maps.Point(21, 38),
-                    icon: $scope.markerImage
+                    flat:true,
+                    anchor: RichMarkerPosition.TOP_LEFT,
+                    content: '<span class="marker" style="background-color: ' + color + '">' + owner + '</span>'
                 });
+
+                var infoBubble = new InfoBubble({
+                  content: '<span class="info-box">' + value.name + '</span>',
+                  shadowStyle: 0,
+                  arrowSize: 0,
+                  borderWidth: 0,
+                  borderRadius: 0,
+                  backgroundColor: 'rgba(0,0,0,0)',
+                  hideCloseButton: true,
+                  padding: 0,
+                  minHeight: 24
+                });
+
+                google.maps.event.addListener(marker, 'click', function(event) {
+                    if(infoBubble.isOpen()) {
+                        infoBubble.close();
+                    } else {
+                        infoBubble.open($scope.map, marker);
+                    }
+                });
+
+                markersArray[owner] = marker;
 
             });
         });
     });
 
-    $scope.showError = false;
-    $scope.showBackdrop = false;
     $scope.toggleMap = function() {
         // angular.element('.festival_map').toggleClass('hidden');
-        $scope.testMessage = 'such modal';
-        $scope.showError = !$scope.showError;
-        $scope.showBackdrop = !$scope.showBackdrop;
+        $scope.showError('word');
     };
 
+    $scope.showError = function(message) {
+        $scope.errorShown = true;
+        $scope.backdropShown = true;
+        $scope.errorMessage = message;
+    };
     $scope.hideError = function() {
-        $scope.showError = false;
-        $scope.showBackdrop = false;
+        $scope.errorShown = false;
+        $scope.backdropShown = false;
     }
 
-    // Dummy event for when user is not logged in
-    $scope.addMarker = function(event) {
-    };
+    $scope.goToMarker = function(coords, owner) {
+        var coords = new google.maps.LatLng(coords.k, coords.A)
+        $scope.map.panTo(coords);
+    }
 
-    $scope.$watch('lastCheckin', function(newValue, oldValue) {
-        console.log('derp', newValue, oldValue)
-    });
+    Auth.getUser().then(function(user) {
+        if(user) {
+            Auth.authorize(user.accessToken).success(function() {
+               // Auth.getUserDetails(user.id).$bind($scope, 'user');
+               $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
+               $scope.userConnection.$bind($scope, 'user');
 
-    $scope.authenticate = function() {
+               if($scope.userConnection.name) {
+                    $scope.user = $scope.userConnection;
+               } else {
+                    $scope.user = {
+                        id: user.id,
+                        coords: '',
+                        owner: user.displayName.charAt(0),
+                        name: user.thirdPartyUserData.name,
+                        time: '',
+                        color: randomColor({hue: 'yellow', count: 1})[0]
+                    };
+                    $scope.userConnection.$set($scope.user);
+               }
 
-        var dataRef = new Firebase("https://cuth.firebaseio.com");
-        $scope.auth = $firebaseSimpleLogin(dataRef);
-
-        $scope.auth.$login('facebook').then(function(user) {
-            console.log(user)
-            $scope.myAccesstoken = user.accessToken;
-            $scope.myInit = user.displayName.charAt(0);
-            $scope.userLoggedIn = true;
-
-            $http.get('https://graph.facebook.com/v2.0/309401922555838?access_token=' + $scope.myAccesstoken).success(function(data) {
-
-                $scope.myMarker = firebaseFactory.singleMarker(user.thirdPartyUserData.username);
-
-                $scope.addMarker = function(event) {
-                    if($scope.lastMarker) {
-                        $scope.lastMarker.setMap(null);
-                    }
-                    if(!$scope.marker) {
-
-                        $scope.marker = new MarkerWithLabel({
-                            position: event.latLng,
-                            map: $scope.map,
-                            draggable: true,
-                            raiseOnDrag: true,
-                            labelContent: $scope.myInit,
-                            labelClass: 'marker__label',
-                            labelInBackground: false,
-                            labelAnchor: new google.maps.Point(21, 38),
-                            icon: $scope.markerImage
-                        });
-
-                        google.maps.event.addListener($scope.marker, 'click', function(event) {
-                            $scope.marker.setMap(null);
-                            $scope.marker = null;
-                        });
-
-                        var time = new Date();
-
-                        $scope.markerData = {
-                            coords: event.latLng,
-                            owner: $scope.myInit,
-                            time: time
-                        };
-
-                        $scope.lastCheckin = time;
-
-                        $scope.myMarker.$set($scope.markerData);
-                    }
-                    else {
-                        var time = new Date();
-                        $scope.marker.setPosition(event.latLng);
-
-                        $scope.markerData = {
-                            coords: event.latLng,
-                            owner: $scope.myInit,
-                            time: time
-                        };
-
-                        $scope.lastCheckin = time;
-
-                        $scope.myMarker.$set($scope.markerData);
-                    }
-                    google.maps.event.addListener($scope.marker, 'dragend', function() {
-                        var time = new Date();
-
-                        $scope.markerData = {
-                            coords: event.latLng,
-                            owner: $scope.myInit,
-                            time: time
-                        };
-
-                        $scope.lastCheckin = time;
-
-                        $scope.myMarker.$set($scope.markerData);
-                    });
-                }
+               $rootScope.appLoading = false;
 
             }).error(function(error) {
+                $rootScope.appLoading = false;
+                $scope.error = error;
+            });
+        } else {
+            $rootScope.appLoading = false;
+        }
+    }, function(error) {
+        $rootScope.appLoading = false;
+    });
 
-            })
+    $scope.addMarker = function(event) {
 
-        }, function(error) {
-            $scope.userLoggedIn = false;
-        });
+        if($scope.user) {
+            var time = new Date();
+
+            if($scope.lastMarker) {
+                $scope.lastMarker.setMap(null);
+            }
+
+            if(!$scope.marker) {
+                if(markersArray[$scope.user.owner]) {
+                    console.log('im in an array');
+                    var oldMarker = markersArray[$scope.user.owner];
+                    oldMarker.setMap(null);
+                }
+
+                $scope.marker = new RichMarker({
+                    position: event.latLng,
+                    map: $scope.map,
+                    draggable: false,
+                    flat:true,
+                    anchor: RichMarkerPosition.TOP_LEFT,
+                    content: '<span class="marker" style="background-color: ' + $scope.user.color + '">' + $scope.user.owner + '</span>'
+                });
+
+                google.maps.event.addListener($scope.marker, 'click', function(event) {
+                    $scope.marker.setMap(null);
+                    $scope.marker = null;
+                });
+
+                $scope.userConnection.coords = event.latLng;
+                $scope.userConnection.$save('coords');
+                $scope.userConnection.time = time;
+                $scope.userConnection.$save('time');
+
+                $scope.markers[$scope.user.id] = $scope.user;
+
+
+            } else {
+
+                $scope.marker.setPosition(event.latLng);
+
+                $scope.userConnection.coords = event.latLng;
+                $scope.userConnection.$save('coords');
+                $scope.userConnection.time = time;
+                $scope.userConnection.$save('time');
+
+                // $scope.markers[$scope.user.owner] = $scope.user;
+
+            }
+        }
     }
 
+    $scope.login = function() {
+
+        $rootScope.asyncLoading = true;
+
+        alert($rootScope.isTouch)
+
+        Auth.login($rootScope.isTouch).then(function(user) {
+
+            if(user) {
+                Auth.authorize(user.accessToken).success(function() {
+                   // Auth.getUserDetails(user.id).$bind($scope, 'user');
+                   $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
+                   $scope.userConnection.$bind($scope, 'user');
+
+                   if($scope.userConnection.name) {
+                        $scope.user = $scope.userConnection;
+                   } else {
+                        $scope.user = {
+                            id: user.id,
+                            coords: '',
+                            owner: user.displayName.charAt(0),
+                            name: user.thirdPartyUserData.name,
+                            time: '',
+                            color: randomColor({hue: 'yellow', count: 1})[0]
+                        };
+                        $scope.userConnection.$set($scope.user);
+                   }
+
+                   $rootScope.asyncLoading = false;
+
+                });
+            } else {
+                $rootScope.asyncLoading = false;
+            }
+        });
+
+    }
+
+    $scope.logout = function() {
+        Auth.logout();
+        // $scope.user = null;
+        $scope.addMarker = function() {
+            $scope.hint = 'Du skal være logget ind for at placere en marker';
+        }
+    }
 });
 /*-----  End of Controller = Main  ------*/
 

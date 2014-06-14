@@ -1,0 +1,32 @@
+.loader {
+    &.loader__fullscreen {
+        position: absolute;
+        display: table;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        line-height: 100%;
+        color: #fff;
+        background: $primary-color;
+        .loader__text {
+            display: table-cell;
+            vertical-align: middle;
+        }
+    }
+    &.loader__small {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        line-height: 100%;
+        color: #fff;
+        background: transparent;
+        .loader__text {
+
+        }
+    }
+}

@@ -1,21 +1,39 @@
-<div
-    map
-    class="map"
-    center="{{mapCenter}}"
-    disable-default-u-i="true"
-    zoom="16"
-    on-click="addMarker()">
-    <!-- <marker
-        ng-repeat="marker in markers"
-        position="[marker.coords.A, marker.coords.K]">
-    </marker> -->
+<div app-layout class="app-layout">
+    <div
+        map
+        class="map app-layout__top"
+        center="{{mapCenter}}"
+        disable-default-u-i="true"
+        zoom="16"
+        on-click="addMarker()">
+    </div>
+
+    <div class="app-layout__bottom">
+        <ul ng-show="markers" class="side-nav">
+            <li ng-repeat="marker in markers" style="background-color: {{marker.color}}">
+                {{marker.name}} har sidst tjekket ind {{marker.time | amCalendar}}
+                <button ng-click="goToMarker(marker.coords, marker.owner)">Men hvor?</button>
+                f: {{marker.color}}
+            </li>
+        </ul>
+
+        <button ng-click="login()" ng-hide="userLoggedIn">Log Ind</button>
+        <p ng-show="userLoggedIn">Hej {{user.name | firstName}}</p>
+        <button ng-click="logout()" ng-show="userLoggedIn">Log Ud</button>
+    </div>
 </div>
-<button ng-click="toggleMap()">Toggle Kort</button>
-<button ng-click="authenticate()">Log Ind</button>
+<div ng-show="appLoading" class="loader loader__fullscreen">
+    <span class="loader__text">loader</span>
+</div>
+<div ng-show="asyncLoading" class="loader loader__small">
+    <span class="loader__text">loader</span>
+</div>
+
+<!-- <button ng-click="toggleMap()">Toggle Kort</button>
 
 <p>Sidste check-in {{lastCheckin | amCalendar}}</p>
 
-<div ng-if="showError" class="dialog dialog--error dialog__animation--jelly">
+<div ng-if="errorShown" class="dialog dialog--error dialog__animation--jelly">
     <div class="" ng-include="'app/main/main.dialog.error.tpl.html'"></div>
 </div>
-<div ng-if="showBackdrop" class="backdrop backdrop__animation--fade"></div>
+<div ng-if="backdropShown" class="backdrop backdrop__animation--fade"></div> -->
