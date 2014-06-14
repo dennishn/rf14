@@ -57582,8 +57582,6 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
 
         $rootScope.asyncLoading = true;
 
-        alert($rootScope.isTouch)
-
         Auth.login($rootScope.isTouch).then(function(user) {
 
             if(user) {
