@@ -1,0 +1,20 @@
+@font-face{
+    font-family: 'colaborate-light';
+    src: url('../fonts/ColabLig-webfont.eot');
+    src: url('../fonts/ColabLig-webfont.eot?iefix') format('eot'),
+         url('../fonts/ColabLig-webfont.woff') format('woff'),
+         url('../fonts/ColabLig-webfont.ttf') format('truetype'),
+         url('../fonts/ColabLig-webfont.svg#webfont') format('svg');
+}
+@font-face{
+    font-family: 'colaborate-thin';
+    src: url('../fonts/ColabThi-webfont.eot');
+    src: url('../fonts/ColabThi-webfont.eot?iefix') format('eot'),
+         url('../fonts/ColabThi-webfont.woff') format('woff'),
+         url('../fonts/ColabThi-webfont.ttf') format('truetype'),
+         url('../fonts/ColabThi-webfont.svg#webfont') format('svg');
+}
+
+body {
+    font-family: 'colaborate-light';
+}

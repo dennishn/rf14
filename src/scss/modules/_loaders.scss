@@ -1,7 +1,7 @@
 .loader {
     &.loader__fullscreen {
         position: absolute;
-        display: table;
+        // display: table;
         top: 0;
         left: 0;
         width: 100%;
@@ -9,10 +9,12 @@
         text-align: center;
         line-height: 100%;
         color: #fff;
-        background: $primary-color;
+        background: #2d3241;
         .loader__text {
-            display: table-cell;
-            vertical-align: middle;
+            position: absolute;
+            width: 100%;
+            bottom: 40px;
+            left: 0;
         }
     }
     &.loader__small {
@@ -28,5 +30,13 @@
         .loader__text {
 
         }
+    }
+}
+
+// Animations
+.loader__fullscreen {
+    transition: all 1s;
+    &.leave {
+        transform: translateY(100%);
     }
 }

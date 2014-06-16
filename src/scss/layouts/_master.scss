@@ -4,7 +4,7 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: $primary-color;
+    background: #2d3241;
 }
 .app {
     position: relative;
@@ -14,5 +14,17 @@ html, body {
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         background: #fff;
+    }
+}
+
+// Animations
+.app-layout {
+    transition: all 1s;
+    opacity: 0;
+    transform: scale(0.5);
+    transform-origin: bottom center;
+    &.enter {
+        transform: scale(1);
+        opacity: 1;
     }
 }
