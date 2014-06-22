@@ -57392,10 +57392,48 @@ USGSOverlay.prototype.draw = function() {
   div.style.height = (sw.y - ne.y) + 'px';
 };
 
-
-app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $firebaseSimpleLogin, FIREBASE_URL, firebaseFactory, Auth) {
+app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $http, $q, $firebase, $firebaseSimpleLogin, FIREBASE_URL, firebaseFactory, Auth) {
 
     'use strict';
+
+    cuthObj = document.getElementById('cuthLogo').cloneNode(true);
+    var current_frame, total_frames, path, length, handle, l, cuthObj;
+
+    $scope.initLogo = function() {
+      current_frame = 0;
+      total_frames = 60;
+      path = new Array();
+      length = new Array();
+      for(var i=0; i<9;i++){
+        path[i] = document.getElementById('i'+i);
+        l = path[i].getTotalLength();
+        length[i] = l;
+        path[i].style.strokeDasharray = l + ' ' + l;
+        path[i].style.strokeDashoffset = l;
+      }
+      handle = 0;
+    }
+
+
+    $scope.drawLogo = function() {
+
+        var progress = current_frame/total_frames;
+        if (progress > 1) {
+            window.cancelAnimationFrame(handle);
+            $timeout(function() {
+                $scope.$emit('logo-animation-end');
+                angular.element('.loader__fullscreen').addClass('leave');
+                angular.element('.app-layout').addClass('enter');
+            }, 1000);
+        } else {
+            current_frame++;
+            for(var j=0; j<path.length;j++){
+                path[j].style.strokeDashoffset = Math.floor(length[j] * (1 - progress));
+            }
+            handle = window.requestAnimationFrame($scope.drawLogo);
+       }
+
+    };
 
     // var dataRef = new Firebase("https://cuth.firebaseio.com");
     // $scope.auth = $firebaseSimpleLogin(dataRef);
@@ -57419,7 +57457,10 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
         url: 'img/marker.svg'
     };
 
-    // $rootScope.appLoading = true;
+    $scope.initLogo();
+    $scope.$on('logo-animation-end', function() {
+        $rootScope.appLoading = false;
+    });
 
     $scope.$on('mapInitialized', function(event, args) {
         $scope.map = args[0];
@@ -57428,46 +57469,53 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
         $scope.markersRef = firebaseFactory.allMarkers();
         $scope.markersRef.$on("loaded", function(markers) {
 
+            $scope.drawLogo();
+
             $scope.markers = markers;
 
             angular.forEach(markers, function(value, key) {
-                var owner = value.owner;
-                var color = value.color;
-                var markerPos = new google.maps.LatLng(value.coords.k, value.coords.A);
-                $scope.lastCheckin = value.time;
+                if(value.coords) {
+                    console.log(value)
+                    var owner = value.owner;
+                    var color = value.color;
+                    var markerPos = new google.maps.LatLng(value.coords.k, value.coords.A);
+                    $scope.lastCheckin = value.time;
 
-                var marker = new RichMarker({
-                    position: markerPos,
-                    map: $scope.map,
-                    draggable: false,
-                    flat:true,
-                    anchor: RichMarkerPosition.TOP_LEFT,
-                    content: '<span class="marker" style="background-color: ' + color + '">' + owner + '</span>'
-                });
+                    var marker = new RichMarker({
+                        position: markerPos,
+                        map: $scope.map,
+                        draggable: false,
+                        flat:true,
+                        anchor: RichMarkerPosition.TOP_LEFT,
+                        content: '<span class="marker" style="background-color: ' + color + '">' + owner + '</span>'
+                    });
 
-                var infoBubble = new InfoBubble({
-                  content: '<span class="info-box">' + value.name + '</span>',
-                  shadowStyle: 0,
-                  arrowSize: 0,
-                  borderWidth: 0,
-                  borderRadius: 0,
-                  backgroundColor: 'rgba(0,0,0,0)',
-                  hideCloseButton: true,
-                  padding: 0,
-                  minHeight: 24
-                });
+                    var infoBubble = new InfoBubble({
+                      content: '<span class="info-box">' + value.name + '</span>',
+                      shadowStyle: 0,
+                      arrowSize: 0,
+                      borderWidth: 0,
+                      borderRadius: 0,
+                      backgroundColor: 'rgba(0,0,0,0)',
+                      hideCloseButton: true,
+                      padding: 0,
+                      minHeight: 24
+                    });
 
-                google.maps.event.addListener(marker, 'click', function(event) {
-                    if(infoBubble.isOpen()) {
-                        infoBubble.close();
-                    } else {
-                        infoBubble.open($scope.map, marker);
-                    }
-                });
+                    google.maps.event.addListener(marker, 'click', function(event) {
+                        if(infoBubble.isOpen()) {
+                            infoBubble.close();
+                        } else {
+                            infoBubble.open($scope.map, marker);
+                        }
+                    });
 
-                markersArray[owner] = marker;
+                    markersArray[owner] = marker;
+                }
 
+                // $rootScope.appLoading = false;
             });
+
         });
     });
 
@@ -57493,8 +57541,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
 
     Auth.getUser().then(function(user) {
         if(user) {
-            Auth.authorize(user.accessToken).success(function() {
-               // Auth.getUserDetails(user.id).$bind($scope, 'user');
+            // Auth.authorize(user.accessToken).success(function() {
                $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
                $scope.userConnection.$bind($scope, 'user');
 
@@ -57507,22 +57554,20 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
                         owner: user.displayName.charAt(0),
                         name: user.thirdPartyUserData.name,
                         time: '',
-                        color: randomColor({hue: 'yellow', count: 1})[0]
+                        color: randomColor({hue: 'purple', count: 1})[0]
                     };
                     $scope.userConnection.$set($scope.user);
                }
 
-               $rootScope.appLoading = false;
-
-            }).error(function(error) {
-                $rootScope.appLoading = false;
-                $scope.error = error;
-            });
+            // }).error(function(error) {
+            //     // $rootScope.appLoading = false;
+            //     $scope.showError(message);
+            // });
         } else {
-            $rootScope.appLoading = false;
+
         }
     }, function(error) {
-        $rootScope.appLoading = false;
+        // $rootScope.appLoading = false;
     });
 
     $scope.addMarker = function(event) {
@@ -57560,7 +57605,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
                 $scope.userConnection.time = time;
                 $scope.userConnection.$save('time');
 
-                $scope.markers[$scope.user.id] = $scope.user;
+                if(!$scope.markers[$scope.user.id]) {
+                    $scope.markers.push($scope.user);
+                } else {
+                    $scope.markers[$scope.user.id] = $scope.user;
+                }
 
 
             } else {
@@ -57572,7 +57621,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
                 $scope.userConnection.time = time;
                 $scope.userConnection.$save('time');
 
-                // $scope.markers[$scope.user.owner] = $scope.user;
+                if(!$scope.markers[$scope.user.id]) {
+                    $scope.markers.push($scope.user);
+                } else {
+                    $scope.markers[$scope.user.id] = $scope.user;
+                }
 
             }
         }
@@ -57585,7 +57638,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
         Auth.login($rootScope.isTouch).then(function(user) {
 
             if(user) {
-                Auth.authorize(user.accessToken).success(function() {
+                // Auth.authorize(user.accessToken).success(function() {
                    // Auth.getUserDetails(user.id).$bind($scope, 'user');
                    $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
                    $scope.userConnection.$bind($scope, 'user');
@@ -57606,7 +57659,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
 
                    $rootScope.asyncLoading = false;
 
-                });
+                // });
             } else {
                 $rootScope.asyncLoading = false;
             }
@@ -57617,7 +57670,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http, $q, $firebase, $
     $scope.logout = function() {
         Auth.logout();
         // $scope.user = null;
+    }
 
+    $scope.toggleMenu = function() {
+        $('.navigation__list').toggleClass('open');
+        $('.navicon-button').toggleClass('open');
     }
 });
 /*-----  End of Controller = Main  ------*/

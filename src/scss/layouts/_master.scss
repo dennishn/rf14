@@ -13,7 +13,7 @@ html, body {
     .app-layout__bottom {
         overflow: auto;
         -webkit-overflow-scrolling: touch;
-        background: #fff;
+        background: #2d3241;
     }
 }
 
@@ -26,5 +26,42 @@ html, body {
     &.enter {
         transform: scale(1);
         opacity: 1;
+    }
+}
+.navigation {
+    position: absolute;
+    right: 0;
+    // width: 50px;
+    z-index: 100;
+    .navigation__list {
+        @include clearfix();
+        float: left;
+        position: relative;
+        margin-top: 5px;
+        background: rgba(45, 50, 65, 0.5);
+        opacity: 0;
+        transition: all .4s ease-in-out;
+        pointer-events: none;
+        > a {
+            float: left;
+            padding: 0 10px;
+            line-height: 33px;
+            opacity: 0;
+            color: #F7D86A;
+            transform: translateX(100%);
+            transition: all .5s ease-in-out;
+        }
+        &.open {
+            opacity: 1;
+            pointer-events: all;
+            background: rgba(45, 50, 65, 1);
+            > a {
+                transform: translateX(0%);
+                opacity: 1;
+                &:last-of-type {
+                    transition-delay: .1s;
+                }
+            }
+        }
     }
 }

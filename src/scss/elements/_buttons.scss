@@ -3,4 +3,101 @@
     height: 40px;
     margin: 0;
     padding: 0;
+    border-radius: $global-radius;
 }
+
+/* Change this to watch in slo-mo */
+$transition-duration: .4s;
+
+
+$size : 100%;
+$toggled-size : 1;
+
+$bodybg : #449a88;
+$navbg : #2a2a2a;
+$pagebg : #2d3241;
+
+.navicon-button {
+  display: inline-block;
+  position: relative;
+  float: right;
+  margin: 5px 5px 0 0;
+  padding: 15px 10px;
+  background: rgba(45, 50, 65, 0.5);
+  transition: $transition-duration/2;
+  cursor: pointer;
+  user-select: none;
+  &.open {
+    background: rgba(45, 50, 65, 1);
+  }
+  .navicon:before, .navicon:after {
+    transition: $transition-duration/2;
+  }
+}
+
+.navicon {
+  position: relative;
+  width: 20px;
+  height: 3px;
+  background: $pagebg;
+  transition: $transition-duration;
+
+  &:after, &:before {
+    display: block;
+    content: "";
+    width: 20px;
+    height: 3px;
+    background: $pagebg;
+    position: absolute;
+    z-index: -1;
+    transition: $transition-duration ($transition-duration/2);
+  }
+
+  &:after { top: -.4rem; }
+  &:before { top: .4rem; }
+}
+
+.open:not(.steps) .navicon:before,
+.open:not(.steps) .navicon:after {
+  top: 0 !important;
+}
+
+.open .navicon:before,
+.open .navicon:after {
+  transition: $transition-duration;
+  background: #F7D86A;
+}
+
+/* Minus */
+.open { transform: scale($toggled-size); }
+
+/* Arrows */
+.open.larr .navicon,
+.open.rarr .navicon,
+.open.uarr .navicon {
+    &:before, &:after {
+      width: 1.5rem;
+    }
+
+    &:before { transform: rotate(35deg); transform-origin: left top; }
+    &:after { transform: rotate(-35deg); transform-origin: left bottom; }
+}
+.open.uarr { transform: scale($toggled-size) rotate(90deg); }
+
+/* Arrows */
+.open.rarr .navicon {
+    &:before { transform: translate3d(1em,0,0) rotate(-35deg); transform-origin: right top; }
+    &:after { transform: translate3d(1em,0,0) rotate(35deg); transform-origin: right bottom; }
+}
+
+/* × and + */
+.open.plus,
+.open.x {
+  .navicon {
+    background: transparent;
+
+    &:after { transform: rotate(45deg); }
+    &:before { transform: rotate(-45deg); }
+  }
+}
+.open.plus { transform: scale($toggled-size) rotate(45deg) }

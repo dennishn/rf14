@@ -1,4 +1,15 @@
+<div class="navigation">
+    <a class="navicon-button x" ng-click="toggleMenu()">
+        <div class="navicon"></div>
+    </a>
+    <div class="navigation__list">
+        <a ng-click="login()" ng-hide="userLoggedIn">Log Ind</a>
+        <a ng-click="logout()" ng-show="userLoggedIn">Log Ud</a>
+        <a ng-click="toggleMap()">RF Kort vis/skjul</a>
+    </div>
+</div>
 <div app-layout class="app-layout">
+
     <div
         map
         class="map app-layout__top"
@@ -11,26 +22,18 @@
     <div class="app-layout__bottom">
         <ul ng-show="markers" class="list">
             <li ng-repeat="marker in markers" class="list__item">
-                <div class="row">
-                    <div class="small-1 columns list__user-color">
-                        <span class="color-icon" style="background-color: {{marker.color}}"></span>
-                    </div>
-                    <div class="small-10 columns list__user-info">
-                        {{marker.name}} <i class="icon-time"></i> {{marker.time | amCalendar}}
-                    </div>
-                    <div class="small-1 columns list__user-action">
-                        <button class="icon-button" ng-click="goToMarker(marker.coords, marker.owner)">
-                            <i class="icon-location-outline"></i>
-                        </button>
-                    </div>
+                <div class="color-icon" style="background-color: {{marker.color}}"></div>
+                <div class="list__user-info">
+                    <span class="list__user-name">{{marker.name}}</span>
+                </div>
+                <div class="list__user-action">
+                    <span class="list__user-time">{{marker.time | amCalendar}}</span>
+                    <button class="icon-button" ng-click="goToMarker(marker.coords, marker.owner)">
+                        <i class="icon-location-outline"></i>
+                    </button>
                 </div>
             </li>
         </ul>
-
-        <button ng-click="login()" ng-hide="userLoggedIn">Log Ind</button>
-        <p ng-show="userLoggedIn">Hej {{user.name | firstName}}</p>
-        <button ng-click="logout()" ng-show="userLoggedIn">Log Ud</button>
-        <button ng-click="toggleMap()">Toggle Kort</button>
     </div>
 </div>
 <div class="loader loader__fullscreen">

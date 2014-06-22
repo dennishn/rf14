@@ -198,7 +198,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
 
     Auth.getUser().then(function(user) {
         if(user) {
-            Auth.authorize(user.accessToken).success(function() {
+            // Auth.authorize(user.accessToken).success(function() {
                $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
                $scope.userConnection.$bind($scope, 'user');
 
@@ -216,10 +216,10 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
                     $scope.userConnection.$set($scope.user);
                }
 
-            }).error(function(error) {
-                // $rootScope.appLoading = false;
-                $scope.showError(message);
-            });
+            // }).error(function(error) {
+            //     // $rootScope.appLoading = false;
+            //     $scope.showError(message);
+            // });
         } else {
 
         }
@@ -262,11 +262,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
                 $scope.userConnection.time = time;
                 $scope.userConnection.$save('time');
 
-                // if(!$scope.markers[$scope.user.id]) {
-                //     $scope.markers.push($scope.user);
-                // } else {
-                //     $scope.markers[$scope.user.id] = $scope.user;
-                // }
+                if(!$scope.markers[$scope.user.id]) {
+                    $scope.markers.push($scope.user);
+                } else {
+                    $scope.markers[$scope.user.id] = $scope.user;
+                }
 
 
             } else {
@@ -278,7 +278,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
                 $scope.userConnection.time = time;
                 $scope.userConnection.$save('time');
 
-                // $scope.markers[$scope.user.owner] = $scope.user;
+                if(!$scope.markers[$scope.user.id]) {
+                    $scope.markers.push($scope.user);
+                } else {
+                    $scope.markers[$scope.user.id] = $scope.user;
+                }
 
             }
         }
@@ -291,7 +295,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
         Auth.login($rootScope.isTouch).then(function(user) {
 
             if(user) {
-                Auth.authorize(user.accessToken).success(function() {
+                // Auth.authorize(user.accessToken).success(function() {
                    // Auth.getUserDetails(user.id).$bind($scope, 'user');
                    $scope.userConnection = $firebase(new Firebase(FIREBASE_URL + '/users/' + user.id));
                    $scope.userConnection.$bind($scope, 'user');
@@ -312,7 +316,7 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
 
                    $rootScope.asyncLoading = false;
 
-                });
+                // });
             } else {
                 $rootScope.asyncLoading = false;
             }
@@ -323,7 +327,11 @@ app.controller('MainCtrl', function ($rootScope, $scope, $document, $timeout, $h
     $scope.logout = function() {
         Auth.logout();
         // $scope.user = null;
+    }
 
+    $scope.toggleMenu = function() {
+        $('.navigation__list').toggleClass('open');
+        $('.navicon-button').toggleClass('open');
     }
 });
 /*-----  End of Controller = Main  ------*/
